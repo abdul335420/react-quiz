@@ -1,21 +1,19 @@
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react'
-import axios from 'axios'
-import { Button,Box } from "@mui/material";
-// import './home.css'
+import {useEffect, useState } from 'react'
+
 const UserHome = () => {
-  const [questions, setQuestions]=useState<any>()
-  const [questionList, setQuestionList]=useState<any>([])
+
+  const [questionList, setQuestionList]=useState([])
   const[currentQuestion, setCurrentQuestion] = useState(0)
   const[userScore, setScore]= useState(0);
 
-  const getData = useCallback(async()=>{
+  const getData = async()=>{
     try {
-      const response:any= await fetch("https://orcalotest-default-rtdb.firebaseio.com/quizAppQuestions.json");
+      const response= await fetch("https://orcalotest-default-rtdb.firebaseio.com/quizAppQuestions.json");
       
       let questionsArray=[]
       const data = await response.json();
-      setQuestions(data)
+
       for(const key in data){
         questionsArray.push({
           id:key,
@@ -26,26 +24,30 @@ const UserHome = () => {
       }
       setQuestionList(questionsArray)
     } catch (error) {
-      // console.log(error);
+      console.log(error);
     }
-  },[])
+  }
   
   useEffect(()=>{
     getData()
   },[])
-  // console.log(questionList.question)
-  console.log(questionList);
+console.log(questionList[currentQuestion])
   const handleChange=(e)=>{ 
     for(const quiz of questionList){
-      if(e.target.value === quiz.correctOption){
+      if(e.target.value === quiz.correctOption && userScore<questionList.length){
         setScore(prev=> prev+1)
       }
     }
-
   }
+
   const handleSubmit=(e)=>{
     e.preventDefault();
-   
+    // for(const quiz of questionList){
+    //   if( e === quiz.correctOption){
+    //     setScore(prev=> prev+1)
+    //   }
+    // }
+    setCurrentQuestion(prev=>prev+1)
   }
 
   return (
@@ -70,7 +72,7 @@ const UserHome = () => {
                             onChange={handleChange}
                             value={o}
                             type="radio"
-                            name={i}
+                            name={i.toString()}
                           />
                           <label className="form-check-label">
                             {o}
@@ -78,13 +80,11 @@ const UserHome = () => {
                         </div>
                     )
                   })}
-                {/* })} */}
                 </div>
                 )
               })}
-
+              <button style={{float:'right',}} type="submit">Next</button>
             </div>
-          <Button sx={{float:'right'}} type="submit">Next</Button>
         </form>
       </div>
 
